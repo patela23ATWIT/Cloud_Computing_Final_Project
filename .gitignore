@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+#Alex Stuff
+*.sql
+./bootstrap.sh
+
 # Distribution / packaging
 .Python
 build/
@@ -127,3 +131,4 @@ venv/
 ENV/
 env/
 env.bak/
+bootstrap.sh
