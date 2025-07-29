@@ -1,10 +1,37 @@
 import requests
 import json
-import vendors
-import inventory  # Add this import
+from driver import vendors  # Add this import
+from driver import inventory  # Add this import
+from driver import products
+from driver import customers  # Add this import
+from driver import orders  # Add this import
+
 
 def driver():
     print("Welcome to the Sporting Shop API Driver!")
+
+    command_map = {
+        "1": lambda url: vendors.get_all_vendors(url),
+        "2": lambda url: vendors.get_vendor_by_id(url),
+        "3": lambda url: vendors.add_new_vendor(url),
+        "4": lambda url: vendors.delete_vendor(url),
+        "5": lambda url: products.get_all_products(url),
+        "6": lambda url: products.get_product_by_code(url),
+        "7": lambda url: products.add_new_product(url),
+        "8": lambda url: products.delete_product(url),
+        "9": lambda url: customers.get_all_customers(url),
+        "10": lambda url: customers.get_customer_by_id(url),
+        "11": lambda url: customers.add_new_customer(url),
+        "12": lambda url: customers.delete_customer(url),
+        "13": lambda url: orders.get_all_orders(url),
+        "14": lambda url: orders.get_order_by_id(url),
+        "15": lambda url: orders.add_new_order(url),
+        "16": lambda url: orders.delete_order(url),
+        "17": lambda url: inventory.get_all_inventory(url),
+        "18": lambda url: inventory.get_inventory_by_id(url),
+        "19": lambda url: inventory.add_inventory(url),
+        "20": lambda url: inventory.remove_inventory(url),
+    }
 
     continueToLoop = True
 
@@ -27,326 +54,21 @@ def driver():
         print("14: Get order by ID")
         print("15: Add new order")
         print("16: Delete order")
-        print("13: Get all inventory")
-        print("14: Get inventory by ID")
-        print("15: Add inventory item")
-        print("16: Remove inventory item")
+        print("17: Get all inventory")
+        print("18: Get inventory by ID")
+        print("19: Add inventory item")
+        print("20: Remove inventory item")
 
         command = input("Enter a command: ")
         base_url = "http://localhost:8000"
 
         if command == "0":
             continueToLoop = False
-        elif command == "1":
-            vendors.get_all_vendors(base_url)
-        elif command == "2":
-            vendors.get_vendor_by_id(base_url)
-        elif command == "3":
-            vendors.add_new_vendor(base_url)
-        elif command == "4":
-            # Delete vendor
-            print("\n=== Delete vendor ===")
-            vendor_id = input("Enter vendor ID to delete: ")
-            confirm = input(f"Are you sure you want to delete vendor {vendor_id}? (y/n): ")
-            
-            if confirm.lower() == 'y':
-                try:
-                    response = requests.delete(f"{base_url}/vendors/{vendor_id}")
-                    if response.status_code == 200:
-                        result = response.json()
-                        print(f"Success: {result['message']}")
-                    elif response.status_code == 404:
-                        print(f"Vendor with ID {vendor_id} not found")
-                    else:
-                        print(f"Error: {response.status_code} - {response.text}")
-                except requests.exceptions.RequestException as e:
-                    print(f"Request failed: {e}")
-            else:
-                print("Delete operation cancelled")
-
-        elif command == "5":
-            #   Get all products
-            print("\n=== Getting all products ===")
-            try:
-                response = requests.get(f"{base_url}/products")
-                if response.status_code == 200:
-                    products = response.json()
-                    print("Products found:")
-                    for product in products["products"]:
-                        print(f"Code: {product['product_code']}, Name: {product['product_name']}, Price: {product['list_price']}")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-
-        elif command == "6":
-            # Get product by code
-            print("\n=== Get product by code ===")
-            product_code = input("Enter product code: ")
-            try:
-                response = requests.get(f"{base_url}/products/{product_code}")
-                if response.status_code == 200:
-                    product = response.json()["product"]
-                    print(f"Product found:")
-                    print(f"Code: {product['product_code']}")
-                    print(f"Name: {product['product_name']}")
-                    print(f"Price: {product['list_price']}")
-                elif response.status_code == 404:
-                    print(f"Product with code {product_code} not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-
-        elif command == "7":
-            # Add new product
-            print("\n=== Add new product ===")
-            category_id = input("Enter category ID: ")
-            product_code = input("Enter product code: ")
-            product_name = input("Enter product name: ")
-            description = input("Enter product description or leave blank: ")
-            list_price = input("Enter product price: ")
-            inventory = input("Enter product inventory: ")
-            discount_percent = input("Enter product discount percent: ")
-            date_added = input("Enter date added (YYYY-MM-DD HH:MM:SS) or leave blank: ")
-
-            product_data = {
-                "category_id": int(category_id),
-                "product_code": product_code,
-                "product_name": product_name,
-                "description": description,
-                "list_price": float(list_price),
-                "inventory": int(inventory),
-                "discount_percent": float(discount_percent),
-                "date_added": date_added if date_added else None
-            }
-
-            try:
-                response = requests.put(f"{base_url}/products", json=product_data)
-                if response.status_code == 200:
-                    result = response.json()
-                    print(f"Success: {result['message']}")
-                    print(f"New product ID: {result['product_id']}")
-                elif response.status_code == 404:
-                    print("Error: Product not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-
-        elif command == "8":
-            # Delete product
-            print("\n=== Delete product ===")
-            product_code = input("Enter product code to delete: ")
-            confirm = input(f"Are you sure you want to delete product {product_code}? (y/n): ")
-
-            if confirm.lower() == 'y':
-                try:
-                    response = requests.delete(f"{base_url}/products/{product_code}")
-                    if response.status_code == 200:
-                        result = response.json()
-                        print(f"Success: {result['message']}")
-                    elif response.status_code == 404:
-                        print(f"Product with code {product_code} not found")
-                    else:
-                        print(f"Error: {response.status_code} - {response.text}")
-                except requests.exceptions.RequestException as e:
-                    print(f"Request failed: {e}")
-            else:
-                print("Delete operation cancelled")
-                
-        elif command == "9":
-            # Get all customers
-            print("\n=== Getting all customers ===")
-            try:
-                response = requests.get(f"{base_url}/customers")
-                if response.status_code == 200:
-                    customers = response.json()
-                    print("Customers found:")
-                    for customer in customers["customers"]:
-                        print(f"ID: {customer['customer_id']}, Name: {customer['first_name']} {customer['last_name']}, Email: {customer['email_address']}")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "10":
-            # Get customer by ID
-            print("\n=== Get customer by ID ===")
-            customer_id = input("Enter customer ID: ")
-            try:
-                response = requests.get(f"{base_url}/customers/{customer_id}")
-                if response.status_code == 200:
-                    customer = response.json()["customer"]
-                    print(f"Customer found:")
-                    print(f"ID: {customer['customer_id']}")
-                    print(f"First Name: {customer['first_name']}")
-                    print(f"Last Name: {customer['last_name']}")
-                    print(f"Email: {customer['email_address']}")
-                elif response.status_code == 404:
-                    print(f"Customer with ID {customer_id} not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "11":
-            # Add new customer
-            print("\n=== Add new customer ===")
-            first_name = input("Enter first name: ")
-            last_name = input("Enter last name: ")
-            email = input("Enter email address: ")
-            password = input("Enter password: ")
-            
-            customer_data = {
-                "first_name": first_name,
-                "last_name": last_name,
-                "email": email,
-                "password": password
-            }
-            
-            try:
-                response = requests.put(f"{base_url}/customers", json=customer_data)
-                if response.status_code == 200:
-                    result = response.json()
-                    print(f"Success: {result['message']}")
-                    print(f"New customer ID: {result['customer_id']}")
-                elif response.status_code == 400:
-                    print("Error: Customer with this email already exists")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "12":
-            # Delete customer
-            print("\n=== Delete customer ===")
-            customer_id = input("Enter customer ID to delete: ")
-            confirm = input(f"Are you sure you want to delete customer {customer_id}? (y/n): ")
-            
-            if confirm.lower() == 'y':
-                try:
-                    response = requests.delete(f"{base_url}/customers/{customer_id}")
-                    if response.status_code == 200:
-                        result = response.json()
-                        print(f"Success: {result['message']}")
-                    elif response.status_code == 404:
-                        print(f"Customer with ID {customer_id} not found")
-                    else:
-                        print(f"Error: {response.status_code} - {response.text}")
-                except requests.exceptions.RequestException as e:
-                    print(f"Request failed: {e}")
-            else:
-                print("Delete operation cancelled")
-                
-        elif command == "13":
-            # Get all orders
-            print("\n=== Getting all orders ===")
-            try:
-                response = requests.get(f"{base_url}/orders")
-                if response.status_code == 200:
-                    orders = response.json()
-                    print("Orders found:")
-                    for order in orders["orders"]:
-                        print(f"Order ID: {order['order_id']}, Customer ID: {order['customer_id']}, Ship Amount: ${order['ship_amount']}")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "14":
-            # Get order by ID
-            print("\n=== Get order by ID ===")
-            order_id = input("Enter order ID: ")
-            try:
-                response = requests.get(f"{base_url}/orders/{order_id}")
-                if response.status_code == 200:
-                    order = response.json()["order"]
-                    print(f"Order found:")
-                    print(f"Order ID: {order['order_id']}")
-                    print(f"Customer ID: {order['customer_id']}")
-                    print(f"Order Date: {order['order_date']}")
-                    print(f"Ship Amount: ${order['ship_amount']}")
-                    print(f"Card Number: {order['card_number']}")
-                elif response.status_code == 404:
-                    print(f"Order with ID {order_id} not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "15":
-            # Add new order
-            print("\n=== Add new order ===")
-            customer_id = input("Enter customer ID: ")
-            order_date = input("Enter order date (YYYY-MM-DD HH:MM:SS): ")
-            ship_amount = input("Enter ship amount: ")
-            ship_address_id = input("Enter ship address ID: ")
-            card_number = input("Enter card number: ")
-            billing_address_id = input("Enter billing address ID: ")
-
-            order_data = {
-                "customer_id": int(customer_id),
-                "order_date": order_date,
-                "ship_amount": float(ship_amount),
-                "ship_address_id": int(ship_address_id),
-                "card_number": card_number,
-                "billing_address_id": int(billing_address_id)
-            }
-
-            try:
-                response = requests.put(f"{base_url}/orders", json=order_data)
-                if response.status_code == 200:
-                    result = response.json()
-                    print(f"Success: {result['message']}")
-                    print(f"New order ID: {result['order_id']}")
-                elif response.status_code == 404:
-                    print("Error: Customer not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
-        elif command == "16":
-            # Delete order
-            print("\n=== Delete order ===")
-            order_id = input("Enter order ID to delete: ")
-            confirm = input(f"Are you sure you want to delete order {order_id}? (y/n): ")
-
-            if confirm.lower() == 'y':
-                try:
-                    response = requests.delete(f"{base_url}/orders/{order_id}")
-                    if response.status_code == 200:
-                        result = response.json()
-                        print(f"Success: {result['message']}")
-                    elif response.status_code == 404:
-                        print(f"Order with ID {order_id} not found")
-                    else:
-                        print(f"Error: {response.status_code} - {response.text}")
-                except requests.exceptions.RequestException as e:
-                    print(f"Request failed: {e}")
-            else:
-                print("Delete operation cancelled")
-            vendors.delete_vendor(base_url)
-        elif command == "13":
-            inventory.get_all_inventory()
-        elif command == "14":
-            product_id = input("Enter product ID: ")
-            inventory.get_inventory_by_id(product_id)
-        elif command == "15":
-            category_id = int(input("Category ID: "))
-            product_code = input("Product code: ")
-            product_name = input("Product name: ")
-            description = input("Description: ")
-            list_price = float(input("List price: "))
-            inv = int(input("Inventory: "))
-            discount_percent = float(input("Discount percent (default 0.0): ") or 0.0)
-            inventory.add_inventory(category_id, product_code, product_name, description, list_price, inv, discount_percent)
-        elif command == "16":
-            product_id = input("Enter product ID to remove: ")
-            inventory.remove_inventory(product_id)
+        elif command in command_map:
+            command_map[command](base_url)
         else:
             print("Invalid Input, Try again.")
+
 
 if __name__ == "__main__":
     driver()
