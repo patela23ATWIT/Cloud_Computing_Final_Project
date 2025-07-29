@@ -1,5 +1,7 @@
 import requests
 import json
+import vendors
+import inventory  # Add this import
 
 def driver():
     print("Welcome to the Sporting Shop API Driver!")
@@ -25,71 +27,22 @@ def driver():
         print("14: Get order by ID")
         print("15: Add new order")
         print("16: Delete order")
+        print("13: Get all inventory")
+        print("14: Get inventory by ID")
+        print("15: Add inventory item")
+        print("16: Remove inventory item")
 
         command = input("Enter a command: ")
         base_url = "http://localhost:8000"
 
         if command == "0":
             continueToLoop = False
-
-        elif command == "1": 
-            # Get all vendors
-            print("\n=== Getting all vendors ===")
-            try:
-                response = requests.get(f"{base_url}/vendors")
-                if response.status_code == 200:
-                    vendors = response.json()
-                    print("Vendors found:")
-                    for vendor in vendors["vendors"]:
-                        print(f"ID: {vendor['vendor_id']}, Name: {vendor['vendor_name']}, Product ID: {vendor['product_id']}")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
+        elif command == "1":
+            vendors.get_all_vendors(base_url)
         elif command == "2":
-            # Get vendor by ID
-            print("\n=== Get vendor by ID ===")
-            vendor_id = input("Enter vendor ID: ")
-            try:
-                response = requests.get(f"{base_url}/vendors/{vendor_id}")
-                if response.status_code == 200:
-                    vendor = response.json()["vendor"]
-                    print(f"Vendor found:")
-                    print(f"ID: {vendor['vendor_id']}")
-                    print(f"Name: {vendor['vendor_name']}")
-                    print(f"Product ID: {vendor['product_id']}")
-                elif response.status_code == 404:
-                    print(f"Vendor with ID {vendor_id} not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
+            vendors.get_vendor_by_id(base_url)
         elif command == "3":
-            # Add new vendor
-            print("\n=== Add new vendor ===")
-            vendor_name = input("Enter vendor name: ")
-            product_id = input("Enter product ID: ")
-            
-            vendor_data = {
-                "vendor_name": vendor_name,
-                "product_id": int(product_id)
-            }
-            
-            try:
-                response = requests.put(f"{base_url}/vendors", json=vendor_data)
-                if response.status_code == 200:
-                    result = response.json()
-                    print(f"Success: {result['message']}")
-                    print(f"New vendor ID: {result['vendor_id']}")
-                elif response.status_code == 404:
-                    print("Error: Product not found")
-                else:
-                    print(f"Error: {response.status_code} - {response.text}")
-            except requests.exceptions.RequestException as e:
-                print(f"Request failed: {e}")
-                
+            vendors.add_new_vendor(base_url)
         elif command == "4":
             # Delete vendor
             print("\n=== Delete vendor ===")
@@ -374,10 +327,26 @@ def driver():
                     print(f"Request failed: {e}")
             else:
                 print("Delete operation cancelled")
-                            
+            vendors.delete_vendor(base_url)
+        elif command == "13":
+            inventory.get_all_inventory()
+        elif command == "14":
+            product_id = input("Enter product ID: ")
+            inventory.get_inventory_by_id(product_id)
+        elif command == "15":
+            category_id = int(input("Category ID: "))
+            product_code = input("Product code: ")
+            product_name = input("Product name: ")
+            description = input("Description: ")
+            list_price = float(input("List price: "))
+            inv = int(input("Inventory: "))
+            discount_percent = float(input("Discount percent (default 0.0): ") or 0.0)
+            inventory.add_inventory(category_id, product_code, product_name, description, list_price, inv, discount_percent)
+        elif command == "16":
+            product_id = input("Enter product ID to remove: ")
+            inventory.remove_inventory(product_id)
         else:
             print("Invalid Input, Try again.")
-
 
 if __name__ == "__main__":
     driver()
