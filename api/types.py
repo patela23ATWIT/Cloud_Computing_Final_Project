@@ -38,3 +38,10 @@ class Order(BaseModel):
     ship_address_id: int
     card_number: str
     billing_address_id: int
+
+
+class Admin(BaseModel):
+    first_name: str
+    last_name: str
+    email_address: str
+    password: str
