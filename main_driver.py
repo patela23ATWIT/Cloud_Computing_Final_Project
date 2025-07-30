@@ -6,6 +6,7 @@ from driver import products
 from driver import customers  # Add this import
 from driver import orders  # Add this import
 from driver import admins  # Add this import
+from driver import categories  # Add this import
 
 
 def driver():
@@ -36,6 +37,10 @@ def driver():
         "22": lambda url: admins.get_admin_by_id(url),
         "23": lambda url: admins.add_new_admin(url),
         "24": lambda url: admins.delete_admin(url),
+        "25": lambda url: categories.get_all_categories(url),
+        "26": lambda url: categories.get_category_by_id(url),
+        "27": lambda url: categories.add_new_category(url),
+        "28": lambda url: categories.delete_category(url),
     }
 
     continueToLoop = True
@@ -67,6 +72,10 @@ def driver():
         print("22: Get admin by ID")
         print("23: Add new admin")
         print("24: Delete admin")
+        print("25: Get all categories")
+        print("26: Get category by ID")
+        print("27: Add new category")
+        print("28: Delete category")
 
         command = input("Enter a command: ")
         base_url = "http://localhost:8000"
