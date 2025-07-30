@@ -45,3 +45,6 @@ class Admin(BaseModel):
     last_name: str
     email_address: str
     password: str
+
+class Category(BaseModel):
+    category_name: str
