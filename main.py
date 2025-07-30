@@ -5,6 +5,7 @@ from api.routers.products import router as product_router
 from api.routers.customers import router as customer_router
 from api.routers.orders import router as order_router
 from api.routers.inventory import router as inventory_router
+from api.routers.admins import router as admin_router
 
 
 app = FastAPI()
@@ -26,3 +27,4 @@ app.include_router(product_router)
 app.include_router(customer_router)
 app.include_router(order_router)
 app.include_router(inventory_router)
+app.include_router(admin_router)
