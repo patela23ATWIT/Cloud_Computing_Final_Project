@@ -61,7 +61,8 @@ The Sporting Shop Management Application is built using FastAPI for the backend 
 - Allow sign-in and sign-out of the command line driver for security  
 - Authenticate admin users against the administrators table  
 - Issue a secure session cookie or token upon successful login  
-- Allow sign-out to invalidate the session  
+- Allow sign-out to invalidate the session
+  
 **Benefit:** Ensures only authorized administrators can access management features, protects the application and database from unauthorized access.
 
 ### 9. Database
@@ -70,7 +71,8 @@ The Sporting Shop Management Application is built using FastAPI for the backend 
 - MySQL database with tables for each business entity  
 - Enforces data integrity with primary and foreign key constraints  
 - Supports efficient queries and updates for all management operations  
-- Provides a single source for all store data  
+- Provides a single source for all store data
+  
 **Benefit:** Ensures data consistency, reliability, and security. Supports all application features and management options.
 
 ### 10. BFF (Backend For The Frontend)
@@ -79,7 +81,8 @@ The Sporting Shop Management Application is built using FastAPI for the backend 
 - Mediates communication between the frontend and the backend  
 - Handles authentication and securely manages cookies/tokens  
 - Validates requests before passing them to backend services  
-- Formats data for frontend consumption  
+- Formats data for frontend consumption
+  
 **Benefit:** Improves security by adding authentication and session management, simplifies frontend development, and ensures a consistent interface for clients.
 
 
@@ -100,7 +103,7 @@ The Sporting Shop Management Application uses a persistent MySQL relational data
 
 
 **3. Configure Database Connection**
-- Set your MySQL password as an environment variable (for Windows PowerShell):  `$env:MYSQL_PASSWORD="your_mysql_password`
+- Set your MySQL password as an environment variable (for Windows PowerShell):  `$env:MYSQL_PASSWORD="your_mysql_password"`
 
 **4. Run the FASTAPI Server**
 - Open terminal to the project directory, and run: `python -m uvicorn main:app --reload --port 8000`
