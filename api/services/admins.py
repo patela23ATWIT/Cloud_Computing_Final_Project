@@ -1,12 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from api.types import Admin
 from api.db import connect_to_db
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 # GET /admins - Get all admins
-@router.get("/admins")
-async def get_admins():
+@app.get("/admins")
+async def get_admins(
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM administrators"
@@ -19,8 +25,14 @@ async def get_admins():
     return {"admins": results}
 
 # GET /admins/{admin_id} - Get a specific admin by ID
-@router.get("/admins/{admin_id}")
-async def get_admin(admin_id: int):
+@app.get("/admins/{admin_id}")
+async def get_admin(
+    admin_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM administrators WHERE admin_id = %s"
@@ -34,8 +46,14 @@ async def get_admin(admin_id: int):
     return {"admin": result}
 
 # PUT /admins - Add a new admin
-@router.put("/admins")
-async def add_admin(admin: Admin):
+@app.put("/admins")
+async def add_admin(
+    admin: Admin,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
     
@@ -64,8 +82,14 @@ async def add_admin(admin: Admin):
     return {"message": f"Admin added successfully", "admin_id": admin_id}
 
 # DELETE /admins/{admin_id} - Remove an admin
-@router.delete("/admins/{admin_id}")
-async def delete_admin(admin_id: int):
+@app.delete("/admins/{admin_id}")
+async def delete_admin(
+    admin_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
     

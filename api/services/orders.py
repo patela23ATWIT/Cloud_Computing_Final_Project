@@ -1,13 +1,19 @@
 from api.db import connect_to_db
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, FastAPI
 from api.types import Order
+from fastapi import HTTPException, FastAPI, Header
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 # ORDER MANAGEMENT ENDPOINTS
 # GET /orders - Get all orders
-@router.get("/orders")
-async def get_orders():
+@app.get("/orders")
+async def get_orders(email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM orders"
@@ -19,8 +25,12 @@ async def get_orders():
 
 
 # GET /orders/{order_id} - Get a specific order by ID
-@router.get("/orders/{order_id}")
-async def get_order(order_id: int):
+@app.get("/orders/{order_id}")
+async def get_order(order_id: int,email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM orders WHERE order_id = %s"
@@ -37,8 +47,12 @@ async def get_order(order_id: int):
 
 
 # PUT /orders - Add a new order
-@router.put("/orders")
-async def add_order(order: Order):
+@app.put("/orders")
+async def add_order(order: Order,email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 
@@ -75,8 +89,12 @@ async def add_order(order: Order):
 
 
 # DELETE /orders/{order_id} - Remove an order
-@router.delete("/orders/{order_id}")
-async def delete_order(order_id: int):
+@app.delete("/orders/{order_id}")
+async def delete_order(order_id: int,email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 

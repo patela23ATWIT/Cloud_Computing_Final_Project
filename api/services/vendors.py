@@ -1,14 +1,20 @@
 from api.db import connect_to_db
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, FastAPI, Header
 from api.types import Vendor
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 
 # VENDOR MANAGEMENT ENDPOINTS
 # GET /vendors - Get all vendors
-@router.get("/vendors")
-async def get_vendors():
+@app.get("/vendors")
+async def get_vendors(
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM vendors"
@@ -22,8 +28,14 @@ async def get_vendors():
 
 
 # GET /vendors/{vendor_id} - Get a specific vendor by ID
-@router.get("/vendors/{vendor_id}")
-async def get_vendor(vendor_id: int):
+@app.get("/vendors/{vendor_id}")
+async def get_vendor(
+    vendor_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM vendors WHERE vendor_id = %s"
@@ -40,8 +52,14 @@ async def get_vendor(vendor_id: int):
 
 
 # PUT /vendors - Add a new vendor
-@router.put("/vendors")
-async def add_vendor(vendor: Vendor):
+@app.put("/vendors")
+async def add_vendor(
+    vendor: Vendor,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 
@@ -68,8 +86,14 @@ async def add_vendor(vendor: Vendor):
 
 
 # DELETE /vendors/{vendor_id} - Remove a vendor
-@router.delete("/vendors/{vendor_id}")
-async def delete_vendor(vendor_id: int):
+@app.delete("/vendors/{vendor_id}")
+async def delete_vendor(
+    vendor_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 

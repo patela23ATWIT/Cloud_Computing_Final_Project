@@ -1,4 +1,4 @@
-import mysql
+import mysql.connector
 import os
 # Database connection
 def connect_to_db():
@@ -10,8 +10,10 @@ def connect_to_db():
             database="my_sporting_shop",
         )
         print("Successfully connected to MySQL database!")
+        #print type of mydb
+        print(f"Type of mydb: {type(mydb)}")
         return mydb  # <-- Move this inside the try block!
-    except mysql.connector.Error as err:
+    except Exception as err:
         print(f"Error connecting to MySQL: {err}")
         return None  # Explicitly return None if connection fails
 
