@@ -99,14 +99,26 @@ The Sporting Shop Management Application uses a persistent MySQL relational data
 
 **2. Install Dependencies**
 - Make sure Python 3.8+ is installed.
-- Install the required Python packages: `pip install fastapi uvicorn mysql-connector-python`
+- Install the required Python packages: `pip install fastapi uvicorn mysql-connector-python httpx`
 
 
 **3. Configure Database Connection**
 - Set your MySQL password as an environment variable (for Windows PowerShell):  `$env:MYSQL_PASSWORD="your_mysql_password"`
 
 **4. Run the FASTAPI Server**
-- Open terminal to the project directory, and run: `python -m uvicorn main:app --reload --port 8000`
+- Open terminal to the project directory, and run: `python main.py` to start up all services. 
 
 **5. Run the Python Driver**
-- Open a new terminal to the project directory, and run: `python main_driver.py`
+- Open a new terminal to the project directory, and run: `python main_driver.py` to run the driver.
+
+**6. Select and Run a Command Operation** 
+- When prompted, select a command number from the menu to perform operations such as viewing, adding, or deleting from our services.
+
+**7. Verify Against the Identity Provider**
+- For operations, the user will be prompted to log in with admin credentials. The application will verify your identity using the Identity Provider service before allowing access to features.
+- Log in with the default admin credentials: 
+- Email: `admin@mysportingshop.com`
+- Password: `1234`
+
+**8. Continue Using the Management Application**
+- After successful authentication, you can continue to use the management application. As long as your session is valid, you can execute additional commands without re-authenticating, for efficient store management.  
