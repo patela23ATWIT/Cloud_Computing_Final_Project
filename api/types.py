@@ -48,3 +48,8 @@ class Admin(BaseModel):
 
 class Category(BaseModel):
     category_name: str
+
+class Cookie(BaseModel):
+    cookie_id: Optional[int] = None
+    admin_id: int
+    cookie: str

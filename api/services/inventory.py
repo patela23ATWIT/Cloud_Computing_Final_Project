@@ -1,12 +1,18 @@
 from api.db import connect_to_db
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, FastAPI, Header
 from api.types import Product
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 
-@router.get("/inventory")
-def get_all_inventory():
+@app.get("/inventory")
+async def get_all_inventory(
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = None
     cursor = None
     try:
@@ -25,8 +31,14 @@ def get_all_inventory():
             mydb.close()
 
 
-@router.get("/inventory/{product_id}")
-def get_inventory_by_id(product_id: int):
+@app.get("/inventory/{product_id}")
+async def get_inventory_by_id(
+    product_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = None
     cursor = None
     try:
@@ -46,8 +58,14 @@ def get_inventory_by_id(product_id: int):
             mydb.close()
 
 
-@router.post("/inventory", status_code=201)
-def add_inventory(product: Product):
+@app.post("/inventory", status_code=201)
+async def add_inventory(
+    product: Product,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = None
     cursor = None
     try:
@@ -80,8 +98,14 @@ def add_inventory(product: Product):
             mydb.close()
 
 
-@router.delete("/inventory/{product_id}")
-def remove_inventory(product_id: int):
+@app.delete("/inventory/{product_id}")
+async def remove_inventory(
+    product_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = None
     cursor = None
     try:

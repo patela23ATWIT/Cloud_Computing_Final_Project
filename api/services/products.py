@@ -1,13 +1,19 @@
 from api.db import connect_to_db
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, FastAPI, Header
 from api.types import Product
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 # PRODUCT MANAGEMENT ENDPOINTS
 # GET /products - Get all products
-@router.get("/products")
-async def get_products():
+@app.get("/products")
+async def get_products(
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM products"
@@ -19,8 +25,14 @@ async def get_products():
 
 
 # GET /products/{product_code} - Get a specific product by code
-@router.get("/products/{product_code}")
-async def get_product(product_code: str):
+@app.get("/products/{product_code}")
+async def get_product(
+    product_code: str,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM products WHERE product_code = %s"
@@ -36,8 +48,14 @@ async def get_product(product_code: str):
 
 
 # PUT /products - Add a new product
-@router.put("/products")
-async def add_product(product: Product):
+@app.put("/products")
+async def add_product(
+    product: Product,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 
@@ -86,8 +104,14 @@ async def add_product(product: Product):
 
 
 # DELETE /products/{product_code} - Remove a product
-@router.delete("/products/{product_code}")
-async def delete_product(product_code: str):
+@app.delete("/products/{product_code}")
+async def delete_product(
+    product_code: str,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
     cursor = mydb.cursor()
 

@@ -1,15 +1,23 @@
 from api.db import connect_to_db
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, FastAPI, Header
 from api.types import Customer
+from api.auth import verify_cookie
 
-router = APIRouter()
+app = FastAPI()
 
 
 # CUSTOMER MANAGEMENT ENDPOINTS
 # GET /customers - Get all customers
-@router.get("/customers")
-async def get_customers():
+@app.get("/customers")
+async def get_customers(
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
+    if mydb is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM customers"
     cursor.execute(query)
@@ -20,9 +28,17 @@ async def get_customers():
 
 
 # GET /customers/{customer_id} - Get a specific customer by ID
-@router.get("/customers/{customer_id}")
-async def get_customer(customer_id: int):
+@app.get("/customers/{customer_id}")
+async def get_customer(
+    customer_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
+    if mydb is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
     cursor = mydb.cursor(dictionary=True)
     query = "SELECT * FROM customers WHERE customer_id = %s"
     cursor.execute(query, (customer_id,))
@@ -38,9 +54,17 @@ async def get_customer(customer_id: int):
 
 
 # PUT /customers - Add a new customer
-@router.put("/customers")
-async def add_customer(customer: Customer):
+@app.put("/customers")
+async def add_customer(
+    customer: Customer,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
+    if mydb is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
     cursor = mydb.cursor()
 
     # First check if the email already exists
@@ -70,9 +94,17 @@ async def add_customer(customer: Customer):
 
 
 # DELETE /customers/{customer_id} - Remove a customer
-@router.delete("/customers/{customer_id}")
-async def delete_customer(customer_id: int):
+@app.delete("/customers/{customer_id}")
+async def delete_customer(
+    customer_id: int,
+    email_address: str = Header(..., alias="X-Email-Address"),
+    cookie: str = Header(..., alias="X-Session-Cookie"),
+):
+    if not await verify_cookie(email_address, cookie):
+        raise HTTPException(status_code=401, detail="Invalid or expired cookie")
     mydb = connect_to_db()
+    if mydb is None:
+        raise HTTPException(status_code=500, detail="Database connection failed")
     cursor = mydb.cursor()
 
     # First check if customer exists
