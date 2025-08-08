@@ -1,9 +1,10 @@
 # Sporting Shop Management Application
 
-## Introduction
-
+## Group Members
 Avi Patel, Jordon Smith, Alex Comeau
 
+
+## Introduction
 
 Welcome to The Sporting Shop, a growing retail store specializing in sports equipment and apparel. As the business expands, managing inventory, products, vendors, customers, orders, categories, and administrative tasks becomes increasingly more complex. To streamline operations, we have created a Sporting Shop Management Application.
 
